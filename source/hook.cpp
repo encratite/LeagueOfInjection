@@ -14,11 +14,12 @@ namespace
 	std::size_t const maximumHookCount = 4;
 }
 
-Hook::Hook(std::string const & description, DWORD address, HookFunction handler):
+Hook::Hook(std::string const & description, DWORD staticAddress, DWORD staticBase, DWORD dynamicBase, HookFunction handler):
 	description(description),
-	address(address),
+	address(staticAddress - staticBase + dynamicBase),
 	handler(handler)
 {
+	std::cout << description << " hook: " << ail::hex_string_32(staticAddress) << " - " << ail::hex_string_32(staticBase) << " + " << ail::hex_string_32(dynamicBase) << " = " << ail::hex_string_32(address) << ": " << ail::hex_string_32(*reinterpret_cast<uint32_t *>(address)) << std::endl;
 }
 
 void installHook(Hook const & hook)

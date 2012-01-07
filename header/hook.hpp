@@ -13,7 +13,7 @@ struct Hook
 	DWORD address;
 	HookFunction handler;
 
-	Hook(std::string const & description, DWORD address, HookFunction handler);
+	Hook(std::string const & description, DWORD staticAddress, DWORD staticBase, DWORD dynamicBase, HookFunction handler);
 };
 
 typedef std::vector<Hook> Hooks;
