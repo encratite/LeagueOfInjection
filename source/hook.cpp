@@ -62,7 +62,8 @@ void setDebugRegisters(CONTEXT & threadContext)
 void processThreadIdentifier(DWORD threadIdentifier)
 {
 	std::string threadString = ail::hex_string_32(threadIdentifier);
-	HANDLE threadHandle = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT, FALSE, threadIdentifier);
+	std::cout << "Processing thread " << threadString << std::endl;
+	HANDLE threadHandle = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_SET_CONTEXT, FALSE, threadIdentifier);
 	if(threadHandle == NULL)
 	{
 		std::cout << "Unable to open thread " << threadString << " with appropriate permissions" << std::endl;
@@ -77,6 +78,7 @@ void processThreadIdentifier(DWORD threadIdentifier)
 	}
 
 	CONTEXT threadContext;
+	threadContext.ContextFlags = CONTEXT_FULL | CONTEXT_DEBUG_REGISTERS;
 	BOOL contextSuccess = GetThreadContext(threadHandle, &threadContext);
 	if(!contextSuccess)
 	{
@@ -85,6 +87,7 @@ void processThreadIdentifier(DWORD threadIdentifier)
 	}
 
 	setDebugRegisters(threadContext);
+
 	contextSuccess = SetThreadContext(threadHandle, &threadContext);
 	if(!contextSuccess)
 	{
@@ -112,9 +115,10 @@ void activateDebugRegisters()
 	THREADENTRY32 entry;
 	entry.dwSize = static_cast<DWORD>(sizeof(THREADENTRY32));
 	BOOL success = Thread32First(snapshot, &entry);
+	DWORD currentProcess = GetCurrentProcessId();
 	while(success)
 	{
-		if(entry.th32ThreadID != currentThreadId)
+		if(entry.th32OwnerProcessID == currentProcess && entry.th32ThreadID != currentThreadId)
 			processThreadIdentifier(entry.th32ThreadID);
 		success = Thread32Next(snapshot, &entry);
 	}
