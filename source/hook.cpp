@@ -60,10 +60,9 @@ void setDebugRegisters(CONTEXT & threadContext)
 		*(debugRegisters[i]) = 0;
 }
 
-void processThreadIdentifier(DWORD threadIdentifier)
+void replaceThreadContext(DWORD threadIdentifier, bool requiresSuspension)
 {
 	std::string threadString = ail::hex_string_32(threadIdentifier);
-	std::cout << "Processing thread " << threadString << std::endl;
 	HANDLE threadHandle = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_SET_CONTEXT, FALSE, threadIdentifier);
 	if(threadHandle == NULL)
 	{
@@ -71,11 +70,14 @@ void processThreadIdentifier(DWORD threadIdentifier)
 		return;
 	}
 
-	DWORD result = SuspendThread(threadHandle);
-	if(result == -1)
+	if(requiresSuspension)
 	{
-		std::cout << "Unable to suspend thread " << threadString << std::endl;
-		return;
+		DWORD result = SuspendThread(threadHandle);
+		if(result == -1)
+		{
+			std::cout << "Unable to suspend thread " << threadString << std::endl;
+			return;
+		}
 	}
 
 	CONTEXT threadContext;
@@ -120,7 +122,7 @@ void activateDebugRegisters()
 	while(success)
 	{
 		if(entry.th32OwnerProcessID == currentProcess && entry.th32ThreadID != currentThreadId)
-			processThreadIdentifier(entry.th32ThreadID);
+			replaceThreadContext(entry.th32ThreadID);
 		success = Thread32Next(snapshot, &entry);
 	}
 	CloseHandle(snapshot);

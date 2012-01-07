@@ -21,4 +21,5 @@ typedef std::vector<Hook> Hooks;
 extern Hooks hooks;
 
 void installHook(Hook const & hook);
+void replaceThreadContext(DWORD threadIdentifier, bool requiresSuspension = true);
 void activateDebugRegisters();
