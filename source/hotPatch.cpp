@@ -32,8 +32,8 @@ bool hotPatchFunction(std::string const & module, std::string const & function, 
 		return false;
 	}
 
-	uint32_t functionAddress = reinterpret_cast<uint32_t>(functionPointer) - reinterpret_cast<uint32_t>(address);
-	std::string replacement_string = ail::little_endian_string(functionAddress, 4);
+	uint32_t functionOffset = reinterpret_cast<uint32_t>(functionPointer) - reinterpret_cast<uint32_t>(address);
+	std::string replacement_string = ail::little_endian_string(functionOffset, 4);
 	std::string replacement = "\xe9" + replacement_string + "\xeb\xf9";
 
 	char * offset = address - 5;
