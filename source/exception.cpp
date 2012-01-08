@@ -14,7 +14,7 @@ void checkForHook(CONTEXT & threadContext)
 	{
 		if(hook.address != threadContext.Eip)
 			continue;
-		std::cout << "Breakpoint: " << hook.description << std::endl;
+		//std::cout << "Breakpoint: " << hook.description << std::endl;
 		hook.handler(threadContext);
 		break;
 	}
@@ -25,7 +25,7 @@ LONG WINAPI vectoredExceptionHandler(PEXCEPTION_POINTERS ExceptionInfo)
 	EXCEPTION_RECORD & exceptionRecord = *(ExceptionInfo->ExceptionRecord);
 	CONTEXT & threadContext = *(ExceptionInfo->ContextRecord);
 
-	std::cout << "Exception type " << ail::hex_string_32(exceptionRecord.ExceptionCode) << " at " << ail::hex_string_32(threadContext.Eip) << " in thread " << ail::hex_string_32(GetCurrentThreadId()) << std::endl;
+	//std::cout << "Exception type " << ail::hex_string_32(exceptionRecord.ExceptionCode) << " at " << ail::hex_string_32(threadContext.Eip) << " in thread " << ail::hex_string_32(GetCurrentThreadId()) << std::endl;
 
 	switch(exceptionRecord.ExceptionCode)
 	{
